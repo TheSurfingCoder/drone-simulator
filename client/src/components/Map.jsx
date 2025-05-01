@@ -7,6 +7,7 @@ import droneIconSvg from '/Users/mbp/Codingprojects/Portfolio-Projects/virtual-d
 
 // Leaflet needs this for icons to display correctly
 import 'leaflet/dist/leaflet.css';
+import WaypointManager from './WaypointManager';
 
 // Optional: custom drone icon (replace path if needed)
 const droneIcon = new L.Icon({
@@ -32,6 +33,8 @@ export default function MapComponent() {
         <Marker position={startPosition} icon={droneIcon}>
           <Popup>Drone Home Base</Popup>
         </Marker>
+
+        <WaypointManager />
       </MapContainer>
     </div>
   );
