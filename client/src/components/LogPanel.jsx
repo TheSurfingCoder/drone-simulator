@@ -1,1 +1,1 @@
-//console-style activity log
+//console-style activitygi
