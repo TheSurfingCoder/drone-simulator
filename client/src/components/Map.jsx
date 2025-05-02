@@ -33,7 +33,12 @@ export default function MapComponent() {
     setLogs([])
   }
 
-  //this is from distanceUtils.js
+  //function to clearwaypoints. This gets passed down to dronecontroller.jsx
+  function clearWaypoints() {
+    setWaypoints([]);
+    setDronePosition([37.7749, -122.4194]); // Optional: reset to home base
+    clearLogs();                          // Optional: clear log
+  }
 
 
 
@@ -52,16 +57,17 @@ export default function MapComponent() {
         <WaypointManager
           waypoints={waypoints} setWaypoints={setWaypoints}
         />
-        <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} />
+        
         <Marker position={dronePosition} icon={droneIcon}>
           <Popup>Drone</Popup>
         </Marker>
-        
-        <MetricsPanel waypoints={waypoints} />
+
+
 
       </MapContainer>
       <LogPanel logs={logs} clearLogs={clearLogs} />
-      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} />
+      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />      <MetricsPanel waypoints={waypoints} />
+      
 
 
     </div>

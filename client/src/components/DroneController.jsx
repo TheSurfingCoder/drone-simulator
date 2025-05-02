@@ -2,8 +2,8 @@
 //drone component is receiving props from map
 import { moveToward } from "../utils/droneMovement";
 
-export default function DroneController({ waypoints, setDronePosition, dronePosition, logs, setLogs }) {
-    
+export default function DroneController({ waypoints, setDronePosition, dronePosition, logs, setLogs, handleClearWaypoints }) {
+
     function handleStartMission() {
         console.log("Starting mission...");
         console.log("Waypoints:", waypoints);
@@ -17,7 +17,7 @@ export default function DroneController({ waypoints, setDronePosition, dronePosi
         let currentTarget = [waypoints[0].lat, waypoints[0].lng]
 
         const interval = setInterval(() => {
-            
+
             const now = new Date(); // Create a Date object.
             const time = now.toLocaleTimeString(); // //i'm calling it within setInterval because i need a new time every 30 milliseconds
             setDronePosition(prev => {
@@ -45,11 +45,11 @@ export default function DroneController({ waypoints, setDronePosition, dronePosi
         }, 30)
 
     }
-/*
-    1. checks waypoints length. if it's 0 then return and do nothing
-    2. setDroneposition is actually changing the drone's positon and it's running every 30 milliseconds
-    3. so every 30 milliseconds we're reutrning an array from nextPos which is setting the drone position and moving it
-*/
+    /*
+        1. checks waypoints length. if it's 0 then return and do nothing
+        2. setDroneposition is actually changing the drone's positon and it's running every 30 milliseconds
+        3. so every 30 milliseconds we're reutrning an array from nextPos which is setting the drone position and moving it
+    */
 
 
     return (
@@ -57,6 +57,12 @@ export default function DroneController({ waypoints, setDronePosition, dronePosi
             <button onClick={handleStartMission}>
                 Start Mission
             </button>
+            <button
+                onClick={handleClearWaypoints}
+            >
+                ❌ Clear Waypoints
+            </button>
+
         </div>
     );
 
