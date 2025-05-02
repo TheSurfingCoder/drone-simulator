@@ -1,11 +1,48 @@
 import { calculateDistance, estimateDuration } from '../utils/distanceUtils'
 import { downloadGeoJSON } from '../utils/exportUtils';
 
-export default function MetricsPanel({ waypoints }) {
+export default function MetricsPanel({ waypoints, setWaypoints, setLogs }) {
 
     const distanceKm = calculateDistance(waypoints);
     const durationSec = estimateDuration(distanceKm);
 
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+      
+        const reader = new FileReader();
+      
+        reader.onload = (e) => {
+            console.log("Raw file content:", e.target.result); 
+            try {
+            const geojson = JSON.parse(e.target.result);
+      
+            if (
+              geojson.type === "Feature" &&
+              geojson.geometry.type === "LineString"
+            ) {
+              const coords = geojson.geometry.coordinates;
+      
+              const newWaypoints = coords.map(([lng, lat]) => ({
+                lat,
+                lng,
+              }));
+      
+              setWaypoints(newWaypoints); // <-- passed from parent
+              setLogs(prev => [...prev, `📥 Imported ${newWaypoints.length} waypoints`]);
+      
+            } else {
+              alert("Invalid GeoJSON: Must be a Feature with LineString geometry.");
+            }
+          } catch (err) {
+            alert("Failed to parse GeoJSON." + err.message);
+            console.error(err);
+          }
+        };
+      
+        reader.readAsText(file);
+      }
+      
 
     return (
         <div style={{
@@ -35,6 +72,14 @@ export default function MetricsPanel({ waypoints }) {
             >
                 📁 Download Flight Plan (.geojson)
             </button>
+            <br></br>
+            <input
+                type="file"
+                accept=".geojson,application/geo+json"
+                onChange={handleFileUpload}
+                style={{marginTop: '0.5em' }}
+            />
+
         </div>
     )
 }

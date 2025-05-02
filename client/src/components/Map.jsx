@@ -57,7 +57,7 @@ export default function MapComponent() {
         <WaypointManager
           waypoints={waypoints} setWaypoints={setWaypoints}
         />
-        
+
         <Marker position={dronePosition} icon={droneIcon}>
           <Popup>Drone</Popup>
         </Marker>
@@ -66,8 +66,9 @@ export default function MapComponent() {
 
       </MapContainer>
       <LogPanel logs={logs} clearLogs={clearLogs} />
-      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />      <MetricsPanel waypoints={waypoints} />
-      
+      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />      
+      <MetricsPanel waypoints={waypoints} setWaypoints={setWaypoints} setLogs={setLogs} />
+
 
 
     </div>
