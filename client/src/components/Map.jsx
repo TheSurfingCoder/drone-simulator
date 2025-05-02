@@ -9,6 +9,11 @@ import WaypointManager from './WaypointManager';
 import { useState } from 'react';
 import DroneController from './DroneController.jsx';
 import LogPanel from './LogPanel.jsx';
+import { GeoJSON } from 'react-leaflet';
+import MetricsPanel from './MetricsPanel.jsx';
+
+
+
 
 // Optional: custom drone icon (replace path if needed)
 const droneIcon = new L.Icon({
@@ -17,19 +22,20 @@ const droneIcon = new L.Icon({
 });
 
 
-//Creating state for Waypoints
-
-
 export default function MapComponent() {
   const startPosition = [37.7749, -122.4194]; // SF coordinates
-  const [waypoints, setWaypoints] = useState([]);
+  const [waypoints, setWaypoints] = useState([]); //waypoints is an array with each element containing an object of lat and lng
   const [dronePosition, setDronePosition] = useState([37.7749, -122.4194]);  // home base
   const [logs, setLogs] = useState([]);
 
-//function to clear log panel
-  function clearLogs(){
+  //function to clear log panel
+  function clearLogs() {
     setLogs([])
   }
+
+  //this is from distanceUtils.js
+
+
 
   return (
     <div className="fullscreen-map">
@@ -50,10 +56,11 @@ export default function MapComponent() {
         <Marker position={dronePosition} icon={droneIcon}>
           <Popup>Drone</Popup>
         </Marker>
-       
+        
+        <MetricsPanel waypoints={waypoints} />
 
       </MapContainer>
-      <LogPanel logs={logs} clearLogs={clearLogs}/>
+      <LogPanel logs={logs} clearLogs={clearLogs} />
       <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} />
 
 
