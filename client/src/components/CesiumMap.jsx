@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
 import { Viewer, Entity } from 'resium';
-
 import {
     Cartesian3,
     Cartographic,
@@ -12,68 +11,48 @@ import {
     Ion
 } from '@cesium/engine';
 
-
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
 export default function CesiumMap() {
     const viewerRef = useRef();
+    const [viewer, setViewer] = useState(null);
     const [terrainProvider, setTerrainProvider] = useState(null);
     const [waypoints, setWaypoints] = useState([]);
-    const viewer = viewerRef.current?.cesiumElement;
 
-
-
+    // ✅ Load Cesium terrain once
     useEffect(() => {
         const loadTerrain = async () => {
             try {
-                if (!import.meta.env.VITE_CESIUM_TOKEN) {
-                    console.error("❌ Cesium Ion token not found in env vars");
+                if (!Ion.defaultAccessToken) {
+                    console.error("❌ Cesium Ion token not found.");
                     return;
-                } else if(import.meta.env.VITE_CESIUM_TOKEN){
-                    console.log("Ion token is valid")
                 }
 
                 const terrain = await CesiumTerrainProvider.fromIonAssetId(1);
                 await terrain.readyPromise;
 
-                console.log("✅ Terrain is ready");
-                console.log("Terrain provider:", terrain);
-
+                console.log("✅ Terrain loaded");
                 setTerrainProvider(terrain);
             } catch (err) {
-                console.error("❌ Failed to load Cesium terrain:", err);
+                console.error("❌ Terrain loading failed:", err);
             }
         };
 
         loadTerrain();
     }, []);
 
+    // ✅ Set default camera view once both viewer + terrain are ready
+    useEffect(() => {
+        const setCameraView = async () => {
+            if (!viewer || !terrainProvider) {
+                console.log("⏳ Waiting on viewer or terrain...");
+                return;
+            }
 
+            await terrainProvider.readyPromise;
+            console.log("📍 Setting default camera view...");
 
-    // ✅ Set default camera angle
-  // ✅ Consolidated into a single useEffect
-useEffect(() => {
-    const init = async () => {
-        if (!viewerRef.current) return;
-
-        if (!import.meta.env.VITE_CESIUM_TOKEN) {
-            console.error("❌ Cesium Ion token not found in env vars");
-            return;
-        }
-
-        try {
-            const terrain = await CesiumTerrainProvider.fromIonAssetId(1);
-            await terrain.readyPromise;
-
-            const viewer = viewerRef.current.cesiumElement;
-            if (!viewer) return;
-
-            console.log("✅ Terrain is ready. Setting terrain + default camera.");
-
-            setTerrainProvider(terrain);
-
-            // ✅ Set default camera after everything is ready
-            viewer.camera.setView({
+            viewer.scene.camera.setView({
                 destination: Cartesian3.fromDegrees(
                     -122.44547431638014,
                     37.611176246617994,
@@ -85,25 +64,39 @@ useEffect(() => {
                     roll: 0.0,
                 },
             });
-        } catch (err) {
-            console.error("❌ Failed to load terrain or set camera:", err);
-        }
+
+            viewer.scene.camera.defaultViewFactor = 0;
+            viewer.scene.camera.defaultViewRectangle = undefined;
+        };
+
+        setCameraView();
+    }, [viewer, terrainProvider]);
+
+    // ✅ Fallback if onReady doesn’t fire
+    useEffect(() => {
+        const tryAttachViewer = () => {
+            if (!viewer && viewerRef.current?.cesiumElement) {
+                console.log("🛠 Manually attaching viewer");
+                setViewer(viewerRef.current.cesiumElement);
+            }
+        };
+
+        const interval = setInterval(tryAttachViewer, 200);
+        return () => clearInterval(interval);
+    }, [viewer]);
+
+    // ✅ Optional viewer init hook (may not always fire reliably)
+    const handleViewerReady = (cesiumViewer) => {
+        console.log("🚀 onReady fired — viewer:", cesiumViewer);
+        setViewer(cesiumViewer);
     };
 
-    init();
-}, []);
-
-
-
+    // ✅ Handle clicks for waypoints
     const handleClick = async (movement) => {
-        const viewer = viewerRef.current?.cesiumElement;
         if (!viewer || !terrainProvider) return;
 
-        const scene = viewer.scene;
-        const camera = scene.camera;
-
-        const ray = camera.getPickRay(movement.position);
-        const ellipsoidPosition = scene.globe.pick(ray, scene);
+        const ray = viewer.scene.camera.getPickRay(movement.position);
+        const ellipsoidPosition = viewer.scene.globe.pick(ray, viewer.scene);
         if (!ellipsoidPosition) return;
 
         const cartographic = Cartographic.fromCartesian(ellipsoidPosition);
@@ -114,16 +107,11 @@ useEffect(() => {
         const lng = CesiumMath.toDegrees(result.longitude);
         const alt = result.height;
 
-        const newWaypoint = { lat, lng, alt };
-        setWaypoints((prev) => [...prev, newWaypoint]);
+        setWaypoints((prev) => [...prev, { lat, lng, alt }]);
     };
-    console.log("Terrain state:", terrainProvider);
-    console.log("Is ready:", terrainProvider?.ready);
 
     if (!terrainProvider) return <div>Loading terrain...</div>;
 
-    console.log("Rendering CesiumMap component...");
-    
     return (
         <div style={{ height: '100vh' }}>
             <Viewer
@@ -131,6 +119,11 @@ useEffect(() => {
                 ref={viewerRef}
                 terrainProvider={terrainProvider}
                 onClick={handleClick}
+                onReady={handleViewerReady}
+                sceneModePicker={false}
+                timeline={false}
+                animation={false}
+                view={null} // 👈 Prevent Resium from overriding your default view
             >
                 {waypoints.map((wp, i) => (
                     <Entity
