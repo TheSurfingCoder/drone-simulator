@@ -3,7 +3,7 @@
 //importing react leaflet compoentnts
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import droneIconSvg from '/Users/mbp/Codingprojects/Portfolio-Projects/virtual-drone/client/src/assets/react.svg'
+import droneIconSvg from '../assets/react.svg'
 import 'leaflet/dist/leaflet.css'; // Leaflet needs this for icons to display correctly
 import WaypointManager from './WaypointManager';
 import { useState } from 'react';
