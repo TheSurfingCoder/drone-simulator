@@ -51,19 +51,48 @@ export default function CesiumMap() {
 
 
     // ✅ Set default camera angle
-    useEffect(() => {
-        const viewer = viewerRef.current?.cesiumElement;
-        if (!viewer || !terrainProvider) return;
+  // ✅ Consolidated into a single useEffect
+useEffect(() => {
+    const init = async () => {
+        if (!viewerRef.current) return;
 
-        viewer.camera.setView({
-            destination: Cartesian3.fromDegrees(-122.44547431638014, 37.611176246617994, 17363.451336429982), // SF
-            orientation: {
-                heading: CesiumMath.toRadians(0.0),
-                pitch: CesiumMath.toRadians(-45.0),
-                roll: 0.0,
-            },
-        });
-    }, [terrainProvider]);  
+        if (!import.meta.env.VITE_CESIUM_TOKEN) {
+            console.error("❌ Cesium Ion token not found in env vars");
+            return;
+        }
+
+        try {
+            const terrain = await CesiumTerrainProvider.fromIonAssetId(1);
+            await terrain.readyPromise;
+
+            const viewer = viewerRef.current.cesiumElement;
+            if (!viewer) return;
+
+            console.log("✅ Terrain is ready. Setting terrain + default camera.");
+
+            setTerrainProvider(terrain);
+
+            // ✅ Set default camera after everything is ready
+            viewer.camera.setView({
+                destination: Cartesian3.fromDegrees(
+                    -122.44547431638014,
+                    37.611176246617994,
+                    17363.451336429982
+                ),
+                orientation: {
+                    heading: CesiumMath.toRadians(0.0),
+                    pitch: CesiumMath.toRadians(-45.0),
+                    roll: 0.0,
+                },
+            });
+        } catch (err) {
+            console.error("❌ Failed to load terrain or set camera:", err);
+        }
+    };
+
+    init();
+}, []);
+
 
 
     const handleClick = async (movement) => {
