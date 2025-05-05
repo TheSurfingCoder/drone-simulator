@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cesium/engine": "^17.0.0",
     "@turf/turf": "^7.2.0",
-    "cesium": "^1.129.0",
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

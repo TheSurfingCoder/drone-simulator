@@ -1,24 +1,70 @@
 import { useRef, useState, useEffect } from 'react';
 import { Viewer, Entity } from 'resium';
+
 import {
     Cartesian3,
     Cartographic,
     sampleTerrainMostDetailed,
-    CesiumTerrainProvider,
     Color,
     Math as CesiumMath,
-    DistanceDisplayCondition
-} from 'cesium';
+    DistanceDisplayCondition,
+    CesiumTerrainProvider,
+    Ion
+} from '@cesium/engine';
+
+
+Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
 export default function CesiumMap() {
     const viewerRef = useRef();
     const [terrainProvider, setTerrainProvider] = useState(null);
     const [waypoints, setWaypoints] = useState([]);
+    const viewer = viewerRef.current?.cesiumElement;
 
-    // Load terrain once on mount
+
+
     useEffect(() => {
-        CesiumTerrainProvider.fromIonAssetId(1).then(setTerrainProvider);
+        const loadTerrain = async () => {
+            try {
+                if (!import.meta.env.VITE_CESIUM_TOKEN) {
+                    console.error("❌ Cesium Ion token not found in env vars");
+                    return;
+                } else if(import.meta.env.VITE_CESIUM_TOKEN){
+                    console.log("Ion token is valid")
+                }
+
+                const terrain = await CesiumTerrainProvider.fromIonAssetId(1);
+                await terrain.readyPromise;
+
+                console.log("✅ Terrain is ready");
+                console.log("Terrain provider:", terrain);
+
+                setTerrainProvider(terrain);
+            } catch (err) {
+                console.error("❌ Failed to load Cesium terrain:", err);
+            }
+        };
+
+        loadTerrain();
     }, []);
+
+
+
+    // ✅ Set default camera angle
+    useEffect(() => {
+        const viewer = viewerRef.current?.cesiumElement;
+        if (!viewer || !terrainProvider) return;
+
+        viewer.camera.setView({
+            destination: Cartesian3.fromDegrees(-122.44547431638014, 37.611176246617994, 17363.451336429982), // SF
+            orientation: {
+                heading: CesiumMath.toRadians(0.0),
+                pitch: CesiumMath.toRadians(-45.0),
+                roll: 0.0,
+            },
+        });
+    }, [terrainProvider]);  
+
 
     const handleClick = async (movement) => {
         const viewer = viewerRef.current?.cesiumElement;
@@ -27,7 +73,6 @@ export default function CesiumMap() {
         const scene = viewer.scene;
         const camera = scene.camera;
 
-        // Proper Cesium way of getting click position
         const ray = camera.getPickRay(movement.position);
         const ellipsoidPosition = scene.globe.pick(ray, scene);
         if (!ellipsoidPosition) return;
@@ -43,10 +88,13 @@ export default function CesiumMap() {
         const newWaypoint = { lat, lng, alt };
         setWaypoints((prev) => [...prev, newWaypoint]);
     };
-
+    console.log("Terrain state:", terrainProvider);
+    console.log("Is ready:", terrainProvider?.ready);
 
     if (!terrainProvider) return <div>Loading terrain...</div>;
 
+    console.log("Rendering CesiumMap component...");
+    
     return (
         <div style={{ height: '100vh' }}>
             <Viewer
@@ -65,27 +113,26 @@ export default function CesiumMap() {
                             color: Color.RED.withAlpha(0.95),
                             outlineColor: Color.WHITE,
                             outlineWidth: 2,
-                            disableDepthTestDistance: Number.POSITIVE_INFINITY, // always draw on top
+                            disableDepthTestDistance: Number.POSITIVE_INFINITY,
                         }}
                         label={{
                             text: `${wp.alt.toFixed(1)}m`,
-                            font: "bold 16px sans-serif",
+                            font: 'bold 16px sans-serif',
                             fillColor: Color.WHITE,
                             outlineColor: Color.BLACK,
                             outlineWidth: 4,
                             showBackground: true,
                             backgroundColor: Color.BLACK.withAlpha(0.6),
-                            verticalOrigin: 1, // ABOVE
+                            verticalOrigin: 1,
                             pixelOffset: new Cartesian3(0, -35, 0),
                             scale: 1.2,
-                            distanceDisplayCondition: new DistanceDisplayCondition(0.0, 10000.0), // hide far away
+                            distanceDisplayCondition: new DistanceDisplayCondition(0.0, 10000.0),
                             disableDepthTestDistance: Number.POSITIVE_INFINITY,
                         }}
                         description={`Lat: ${wp.lat.toFixed(5)}, Lng: ${wp.lng.toFixed(5)}, Alt: ${wp.alt.toFixed(2)}m`}
                     />
                 ))}
             </Viewer>
-
         </div>
     );
 }

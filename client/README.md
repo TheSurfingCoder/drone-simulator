@@ -15,6 +15,8 @@ Get rid of Cesium logo + bottom credits
 Switch between metric and imperial units
 ‣ Essential for broader user appeal. Can be a dropdown or toggle.
 
+Allow for current location
+
 🔹 Phase 2 – Mission Planning System
 Add MissionPlanner UI (Create / Import / Export buttons)
 ‣ This becomes your app’s core CTA. Clean and approachable.
