@@ -43,7 +43,7 @@ export default function MapComponent() {
 
 
   return (
-    <div className="fullscreen-map">
+    <div style={{ height: '100vh', width: '100%' }}>
       <MapContainer
         center={startPosition}
         zoom={13}
