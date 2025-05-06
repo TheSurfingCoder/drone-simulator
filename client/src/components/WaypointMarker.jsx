@@ -1,11 +1,21 @@
-//use this to create the WaypointMarker. Props are passed down from waypoint manager
-
 import { Marker, Popup } from 'react-leaflet';
 
-export default function WaypointMarker({ lat, lng, index }) {
+export default function WaypointMarker({ lat, lng, alt, index, unitSystem }) {
+  const altitude = alt ?? 0;
+  const formattedAlt =
+    unitSystem === 'metric'
+      ? `${altitude.toFixed(1)} m`
+      : `${(altitude * 3.28084).toFixed(1)} ft`;
+
   return (
     <Marker position={[lat, lng]}>
-      <Popup>Waypoint {index + 1}</Popup>
+      <Popup>
+        <div>
+          <strong>Waypoint {index + 1}</strong>
+          <br />
+          Alt: {formattedAlt}
+        </div>
+      </Popup>
     </Marker>
   );
 }

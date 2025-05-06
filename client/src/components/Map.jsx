@@ -11,7 +11,7 @@ import DroneController from './DroneController.jsx';
 import LogPanel from './LogPanel.jsx';
 import { GeoJSON } from 'react-leaflet';
 import MetricsPanel from './MetricsPanel.jsx';
-
+import UnitToggle from './UnitToggle.jsx';
 
 
 
@@ -22,9 +22,8 @@ const droneIcon = new L.Icon({
 });
 
 
-export default function MapComponent() {
+export default function MapComponent({ waypoints, setWaypoints, unitSystem, setUnitSystem }) {
   const startPosition = [37.7749, -122.4194]; // SF coordinates
-  const [waypoints, setWaypoints] = useState([]); //waypoints is an array with each element containing an object of lat and lng
   const [dronePosition, setDronePosition] = useState([37.7749, -122.4194]);  // home base
   const [logs, setLogs] = useState([]);
 
@@ -55,7 +54,7 @@ export default function MapComponent() {
           attribution='&copy; OpenStreetMap contributors'
         />
         <WaypointManager
-          waypoints={waypoints} setWaypoints={setWaypoints}
+          waypoints={waypoints} setWaypoints={setWaypoints} unitSystem={unitSystem}
         />
 
         <Marker position={dronePosition} icon={droneIcon}>
@@ -66,8 +65,23 @@ export default function MapComponent() {
 
       </MapContainer>
       <LogPanel logs={logs} clearLogs={clearLogs} />
-      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />      
+      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />
       <MetricsPanel waypoints={waypoints} setWaypoints={setWaypoints} setLogs={setLogs} />
+      <div
+        style={{
+          position: 'absolute',
+          top: '12px',
+          left: '12px',
+          backgroundColor: 'white',
+          padding: '6px 10px',
+          borderRadius: '4px',
+          boxShadow: '0 1px 6px rgba(0, 0, 0, 0.2)',
+          zIndex: 999,
+        }}
+      >
+        <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
+      </div>
+
 
 
 
