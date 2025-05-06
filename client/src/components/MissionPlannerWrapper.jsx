@@ -1,42 +1,86 @@
 import { useState } from 'react';
-import MapComponent from './Map.jsx';
+import MapComponent from './Map';
 import CesiumMap from './CesiumMap';
-import 'leaflet/dist/leaflet.css';
+import UnitToggle from './UnitToggle';
+import DroneController from './DroneController';
+import LogPanel from './LogPanel';
+import WaypointList from './WaypointList';
+import MetricsPanel from './MetricsPanel';
 
 export default function MissionPlannerWrapper() {
-  const [viewMode, setViewMode] = useState("2d");
-
-  // ✅ Shared state (lifted)
+  const [viewMode, setViewMode] = useState('2d');
   const [waypoints, setWaypoints] = useState([]);
-  const [unitSystem, setUnitSystem] = useState("metric");
+  const [unitSystem, setUnitSystem] = useState('metric');
+  const [dronePosition, setDronePosition] = useState([37.7749, -122.4194]); // SF default
+  const [logs, setLogs] = useState([]);
 
-  console.log("🔁 Rendering view:", viewMode);
-console.log("📌 Waypoints count:", waypoints.length);
+  const clearWaypoints = () => {
+    setWaypoints([]);
+  };
 
-
+  const clearLogs = () => {
+    setLogs([]);
+  };
 
   return (
-    <div>
-      <div style={{ position: 'absolute', top: 100, right: 10, zIndex: 2000 }}>
-        <button onClick={() => setViewMode("2d")}>2D View</button>
-        <button onClick={() => setViewMode("3d")}>3D View</button>
+    <div className="h-screen w-screen relative">
+      {/* 🧭 Top Bar */}
+      <div className="absolute top-0 left-0 w-full h-14 bg-white shadow-md px-4 py-2 flex justify-between items-center z-[999]">
+        <div className="flex items-center gap-3">
+          <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
+          <DroneController
+          className="bg-green-600 text-white px-3 py-1 rounded"
+          waypoints={waypoints}
+          setDronePosition={setDronePosition}
+          dronePosition={dronePosition}
+          logs={logs}
+          setLogs={setLogs}
+          handleClearWaypoints={clearWaypoints}
+        />
+        </div>
+        <div>
+          <button
+            className="bg-blue-600 text-white px-3 py-1 rounded"
+            onClick={() => setViewMode(viewMode === '2d' ? '3d' : '2d')}
+          >
+            Switch to {viewMode === '2d' ? '3D' : '2D'}
+          </button>
+        </div>
       </div>
 
-      {viewMode === "2d" ? (
-        <MapComponent
-          waypoints={waypoints}
-          setWaypoints={setWaypoints}
-          unitSystem={unitSystem}
-          setUnitSystem={setUnitSystem}
-        />
-      ) : (
-        <CesiumMap
-          waypoints={waypoints}
-          setWaypoints={setWaypoints}
-          unitSystem={unitSystem}
-          setUnitSystem={setUnitSystem}
-        />
-      )}
+      {/* 🗺 Map View (with top bar padding) */}
+      <div className="h-full w-full pt-14">
+        {viewMode === '2d' ? (
+          <MapComponent
+            waypoints={waypoints}
+            setWaypoints={setWaypoints}
+            unitSystem={unitSystem}
+            setUnitSystem={setUnitSystem}
+            dronePosition={dronePosition}
+          />
+        ) : (
+          <CesiumMap
+            waypoints={waypoints}
+            setWaypoints={setWaypoints}
+            unitSystem={unitSystem}
+            setUnitSystem={setUnitSystem}
+          />
+        )}
+      </div>
+
+      {/* 📍 Floating Panels */}
+
+      <div className="absolute bottom-4 right-4 z-30 w-80">
+        <LogPanel logs={logs} clearLogs={clearLogs} />
+      </div>
+
+      <div className="absolute top-[4.5rem] right-4 z-30 w-80">
+        <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} />
+      </div>
+
+      <div className="absolute top-[4.5rem] left-4 z-30 w-72">
+        <MetricsPanel waypoints={waypoints} setWaypoints={setWaypoints} setLogs={setLogs} />
+      </div>
     </div>
   );
 }

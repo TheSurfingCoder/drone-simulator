@@ -53,7 +53,7 @@ export default function DroneController({ waypoints, setDronePosition, dronePosi
 
 
     return (
-        <div style={{ position: 'absolute', top: 20, left: 200, zIndex: 1000 }}>
+        <div>
             <button onClick={handleStartMission}>
                 Start Mission
             </button>

@@ -1,11 +1,29 @@
-/* src/styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your existing styles */
+
+/* Force Cesium viewer canvas behind all UI */
+
+
 
 body, html, #root {
-    height: 100%;
-    margin: 0;
-  }
+  height: 100%;
+  margin: 0;
+}
 
 .fullscreen-map {
-    height: 100%;
-    width: 100%;
-  }
+  height: calc(100vh - 3.5rem); /* match Tailwind top bar */
+  width: 100%;
+}
+
+
+.cesium-viewer,
+.cesium-widget,
+.cesium-widget canvas {
+  z-index: 0 !important;
+}
+
+
+

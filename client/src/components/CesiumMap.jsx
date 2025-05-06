@@ -47,41 +47,23 @@ export default function CesiumMap({ waypoints, setWaypoints, unitSystem, setUnit
     if (!terrainProvider) return <div>Loading terrain...</div>;
 
     return (
-        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-
-            <div style={{ flex: 1 }}>
-                <Viewer
-                    full
-                    ref={viewerRef}
-                    terrainProvider={terrainProvider}
-                    onClick={handleClick}
-                    sceneModePicker={false}
-                    timeline={false}
-                    animation={false}
-                    view={null}
-                >
-                    {waypoints.map((wp, i) => {
-                        return (
-                            <CesiumWaypointEntity key={i} wp={wp} unitSystem={unitSystem} index={i} />
-                        )
-                    })}
-                </Viewer>
-                <div style={{
-                    position: 'absolute',
-                    top: '12px',
-                    left: '12px',
-                    backgroundColor: 'white',
-                    padding: '6px 10px',
-                    borderRadius: '4px',
-                    boxShadow: '0 1px 6px rgba(0, 0, 0, 0.2)',
-                    zIndex: 999
-                }}>
-                    <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
-                </div>
-                <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} />
-
-
-            </div>
+        <div className="relative w-full h-full z-0">
+          <Viewer
+            full
+            ref={viewerRef}
+            terrainProvider={terrainProvider}
+            onClick={handleClick}
+           className="z-0"
+            sceneModePicker={false}
+            timeline={false}
+            animation={false}
+            view={null}
+          >
+            {waypoints.map((wp, i) => (
+              <CesiumWaypointEntity key={i} wp={wp} unitSystem={unitSystem} index={i} />
+            ))}
+          </Viewer>
         </div>
-    );
+      );
+      
 }

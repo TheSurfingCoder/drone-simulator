@@ -12,45 +12,30 @@ import LogPanel from './LogPanel.jsx';
 import { GeoJSON } from 'react-leaflet';
 import MetricsPanel from './MetricsPanel.jsx';
 import UnitToggle from './UnitToggle.jsx';
-import WaypointList from './WaypointList';
 
 
 
 // Optional: custom drone icon (replace path if needed)
-const droneIcon = new L.Icon({
-  iconUrl: droneIconSvg,  // or use default Leaflet icon
-  iconSize: [30, 30],
-});
 
 
-export default function MapComponent({ waypoints, setWaypoints, unitSystem, setUnitSystem }) {
+
+export default function MapComponent({ waypoints, setWaypoints, unitSystem, setUnitSystem, dronePosition }) {
+  // home base
   const startPosition = [37.7749, -122.4194]; // SF coordinates
-  const [dronePosition, setDronePosition] = useState([37.7749, -122.4194]);  // home base
-  const [logs, setLogs] = useState([]);
 
-
-
-  //function to clear log panel
-  function clearLogs() {
-    setLogs([])
-  }
-
-  //function to clearwaypoints. This gets passed down to dronecontroller.jsx
-  function clearWaypoints() {
-    setWaypoints([]);
-    setDronePosition([37.7749, -122.4194]); // Optional: reset to home base
-    clearLogs();                          // Optional: clear log
-  }
-
+  const droneIcon = new L.Icon({
+    iconUrl: droneIconSvg, // or use default Leaflet icon
+    iconSize: [30, 30],
+  });
 
 
   return (
-    <div style={{ height: '100vh', width: '100%' }}>
+    <div className="relative h-full w-full">
       <MapContainer
         center={startPosition}
         zoom={13}
         scrollWheelZoom={true}
-        className="fullscreen-map"
+        className="fullscreen-map z-0"
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -63,28 +48,6 @@ export default function MapComponent({ waypoints, setWaypoints, unitSystem, setU
           <Popup>Drone</Popup>
         </Marker>
       </MapContainer>
-      <LogPanel logs={logs} clearLogs={clearLogs} />
-      <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />
-      <MetricsPanel waypoints={waypoints} setWaypoints={setWaypoints} setLogs={setLogs} />
-      <div
-        style={{
-          position: 'absolute',
-          top: '12px',
-          left: '12px',
-          backgroundColor: 'white',
-          padding: '6px 10px',
-          borderRadius: '4px',
-          boxShadow: '0 1px 6px rgba(0, 0, 0, 0.2)',
-          zIndex: 999,
-        }}
-      >
-        <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
-      </div>
-      <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} />
-
-
-
-
 
     </div>
   );
