@@ -12,6 +12,7 @@ import LogPanel from './LogPanel.jsx';
 import { GeoJSON } from 'react-leaflet';
 import MetricsPanel from './MetricsPanel.jsx';
 import UnitToggle from './UnitToggle.jsx';
+import WaypointList from './WaypointList';
 
 
 
@@ -26,7 +27,7 @@ export default function MapComponent({ waypoints, setWaypoints, unitSystem, setU
   const startPosition = [37.7749, -122.4194]; // SF coordinates
   const [dronePosition, setDronePosition] = useState([37.7749, -122.4194]);  // home base
   const [logs, setLogs] = useState([]);
-  
+
 
 
   //function to clear log panel
@@ -58,13 +59,9 @@ export default function MapComponent({ waypoints, setWaypoints, unitSystem, setU
         <WaypointManager
           waypoints={waypoints} setWaypoints={setWaypoints} unitSystem={unitSystem}
         />
-
         <Marker position={dronePosition} icon={droneIcon}>
           <Popup>Drone</Popup>
         </Marker>
-
-
-
       </MapContainer>
       <LogPanel logs={logs} clearLogs={clearLogs} />
       <DroneController waypoints={waypoints} setDronePosition={setDronePosition} dronePosition={dronePosition} logs={logs} setLogs={setLogs} handleClearWaypoints={clearWaypoints} />
@@ -83,6 +80,8 @@ export default function MapComponent({ waypoints, setWaypoints, unitSystem, setU
       >
         <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
       </div>
+      <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} />
+
 
 
 

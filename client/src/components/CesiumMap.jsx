@@ -13,6 +13,8 @@ import {
 import UnitToggle from './UnitToggle';
 import CesiumWaypointEntity from './CesiumWaypointEntity';
 import useCesiumInit from '../hooks/useCesiumInit';
+import WaypointList from './WaypointList';
+
 
 
 
@@ -76,6 +78,8 @@ export default function CesiumMap({ waypoints, setWaypoints, unitSystem, setUnit
                 }}>
                     <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
                 </div>
+                <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} />
+
 
             </div>
         </div>

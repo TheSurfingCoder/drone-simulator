@@ -8,7 +8,7 @@ Set up a public repo + write a good README
 
 
 
-set up API key rate limiting in Cesium account
+
 
 Allow for current location
 
@@ -40,3 +40,5 @@ Clicking the air for altitude estimation
 
 Flatten buttons to look like UI on terrain (billboarding)
 ‣ Low priority polish. Cool, but can do after core features.
+
+set up API key rate limiting in Cesium account
