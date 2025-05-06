@@ -10,6 +10,7 @@ import {
     CesiumTerrainProvider,
     Ion
 } from '@cesium/engine';
+import UnitToggle from './UnitToggle';
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
@@ -18,6 +19,8 @@ export default function CesiumMap() {
     const [viewer, setViewer] = useState(null);
     const [terrainProvider, setTerrainProvider] = useState(null);
     const [waypoints, setWaypoints] = useState([]);
+    const [unitSystem, setUnitSystem] = useState('metric');
+
 
     // ✅ Load Cesium terrain once
     useEffect(() => {
@@ -113,48 +116,70 @@ export default function CesiumMap() {
     if (!terrainProvider) return <div>Loading terrain...</div>;
 
     return (
-        <div style={{ height: '100vh' }}>
-            <Viewer
-                full
-                ref={viewerRef}
-                terrainProvider={terrainProvider}
-                onClick={handleClick}
-                onReady={handleViewerReady}
-                sceneModePicker={false}
-                timeline={false}
-                animation={false}
-                view={null} // 👈 Prevent Resium from overriding your default view
-            >
-                {waypoints.map((wp, i) => (
-                    <Entity
-                        key={i}
-                        name={`Waypoint ${i + 1}`}
-                        position={Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt)}
-                        point={{
-                            pixelSize: 14,
-                            color: Color.RED.withAlpha(0.95),
-                            outlineColor: Color.WHITE,
-                            outlineWidth: 2,
-                            disableDepthTestDistance: Number.POSITIVE_INFINITY,
-                        }}
-                        label={{
-                            text: `${wp.alt.toFixed(1)}m`,
-                            font: 'bold 16px sans-serif',
-                            fillColor: Color.WHITE,
-                            outlineColor: Color.BLACK,
-                            outlineWidth: 4,
-                            showBackground: true,
-                            backgroundColor: Color.BLACK.withAlpha(0.6),
-                            verticalOrigin: 1,
-                            pixelOffset: new Cartesian3(0, -35, 0),
-                            scale: 1.2,
-                            distanceDisplayCondition: new DistanceDisplayCondition(0.0, 10000.0),
-                            disableDepthTestDistance: Number.POSITIVE_INFINITY,
-                        }}
-                        description={`Lat: ${wp.lat.toFixed(5)}, Lng: ${wp.lng.toFixed(5)}, Alt: ${wp.alt.toFixed(2)}m`}
-                    />
-                ))}
-            </Viewer>
+        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+
+            <div style={{ flex: 1 }}>
+                <Viewer
+                    full
+                    ref={viewerRef}
+                    terrainProvider={terrainProvider}
+                    onClick={handleClick}
+                    onReady={handleViewerReady}
+                    sceneModePicker={false}
+                    timeline={false}
+                    animation={false}
+                    view={null}
+                >
+                    {waypoints.map((wp, i) => (
+                        <Entity
+                            key={i}
+                            name={`Waypoint ${i + 1}`}
+                            position={Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt)}
+                            point={{
+                                pixelSize: 14,
+                                color: Color.RED.withAlpha(0.95),
+                                outlineColor: Color.WHITE,
+                                outlineWidth: 2,
+                                disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                            }}
+                            label={{
+                                text:
+                                    unitSystem === 'metric'
+                                        ? `${wp.alt.toFixed(1)} m`
+                                        : `${(wp.alt * 3.28084).toFixed(1)} ft`,
+                                font: 'bold 16px sans-serif',
+                                fillColor: Color.WHITE,
+                                outlineColor: Color.BLACK,
+                                outlineWidth: 4,
+                                showBackground: true,
+                                backgroundColor: Color.BLACK.withAlpha(0.6),
+                                verticalOrigin: 1,
+                                pixelOffset: new Cartesian3(0, -35, 0),
+                                scale: 1.2,
+                                distanceDisplayCondition: new DistanceDisplayCondition(0.0, 10000.0),
+                                disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                            }}
+                            description={`Lat: ${wp.lat.toFixed(5)}, Lng: ${wp.lng.toFixed(5)}, Alt: ${unitSystem === 'metric'
+                                    ? `${wp.alt.toFixed(2)}m`
+                                    : `${(wp.alt * 3.28084).toFixed(2)}ft`
+                                }`}
+                        />
+                    ))}
+                </Viewer>
+                <div style={{
+                    position: 'absolute',
+                    top: '12px',
+                    left: '12px',
+                    backgroundColor: 'white',
+                    padding: '6px 10px',
+                    borderRadius: '4px',
+                    boxShadow: '0 1px 6px rgba(0, 0, 0, 0.2)',
+                    zIndex: 999
+                }}>
+                    <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
+                </div>
+
+            </div>
         </div>
     );
 }

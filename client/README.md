@@ -1,19 +1,12 @@
 ✅ Prioritized Roadmap (with notes)
 🔹 Phase 1 – Core Usability + Launch Readiness
-Deploy on Vercel
-‣ Get it live so you can show, test, and iterate.
+
 
 Set up a public repo + write a good README
 ‣ Include a short video/GIF demo, project purpose, stack, and usage instructions.
 
-Set default terrain + camera angle
-‣ Tilted, terrain-aware planning feels 10x better than top-down.
 
-Get rid of Cesium logo + bottom credits
-‣ Makes it feel polished and branded. Easy win.
 
-Switch between metric and imperial units
-‣ Essential for broader user appeal. Can be a dropdown or toggle.
 
 set up API key rate limiting in Cesium account
 
