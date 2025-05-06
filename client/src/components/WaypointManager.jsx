@@ -27,6 +27,7 @@ export default function WaypointManager({waypoints, setWaypoints}) {
               lat={point.lat}
               lng={point.lng}
               index={index}
+              
             />
           )
         })

@@ -5,7 +5,15 @@ import { Marker, Popup } from 'react-leaflet';
 export default function WaypointMarker({ lat, lng, index }) {
   return (
     <Marker position={[lat, lng]}>
-      <Popup>Waypoint {index + 1}</Popup>
+      <Popup>Waypoint {index + 1}
+        <div>
+          {`lat: ${lat}`}
+        </div>
+        <div>
+          {`lng: ${lng}`}
+        </div>
+      </Popup>
+      
     </Marker>
   );
 }
