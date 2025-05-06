@@ -6,9 +6,7 @@ import WaypointMarker from './WaypointMarker.jsx';
 
 
 
-export default function WaypointManager({waypoints, setWaypoints}) {
-
- 
+export default function WaypointManager({ waypoints, setWaypoints, unitSystem }) {
 
   useMapEvents({
     click(e) {
@@ -20,14 +18,16 @@ export default function WaypointManager({waypoints, setWaypoints}) {
   return (
     <>
       {
-        waypoints.map((point, index) => {
+        waypoints.map((wp, i) => {
           return (
             <WaypointMarker
-              key={index}
-              lat={point.lat}
-              lng={point.lng}
-              index={index}
-              
+              key={i}
+              lat={wp.lat}
+              lng={wp.lng}
+              alt={wp.alt}
+              index={i}
+              unitSystem={unitSystem}
+
             />
           )
         })

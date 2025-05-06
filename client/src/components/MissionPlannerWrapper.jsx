@@ -1,11 +1,18 @@
 import { useState } from 'react';
-import MapComponent from './Map.jsx';         // your Leaflet map
-import CesiumMap from './CesiumMap'; // your 3D globe
+import MapComponent from './Map.jsx';
+import CesiumMap from './CesiumMap';
 import 'leaflet/dist/leaflet.css';
 
 export default function MissionPlannerWrapper() {
   const [viewMode, setViewMode] = useState("2d");
-    console.log(viewMode);
+
+  // ✅ Shared state (lifted)
+  const [waypoints, setWaypoints] = useState([]);
+  const [unitSystem, setUnitSystem] = useState("metric");
+
+  console.log("🔁 Rendering view:", viewMode);
+console.log("📌 Waypoints count:", waypoints.length);
+
 
 
   return (
@@ -15,7 +22,21 @@ export default function MissionPlannerWrapper() {
         <button onClick={() => setViewMode("3d")}>3D View</button>
       </div>
 
-      {viewMode === "2d" ? <MapComponent /> : <CesiumMap />}
+      {viewMode === "2d" ? (
+        <MapComponent
+          waypoints={waypoints}
+          setWaypoints={setWaypoints}
+          unitSystem={unitSystem}
+          setUnitSystem={setUnitSystem}
+        />
+      ) : (
+        <CesiumMap
+          waypoints={waypoints}
+          setWaypoints={setWaypoints}
+          unitSystem={unitSystem}
+          setUnitSystem={setUnitSystem}
+        />
+      )}
     </div>
   );
 }
