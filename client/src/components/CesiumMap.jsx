@@ -7,8 +7,9 @@ import {
   Math as CesiumMath,
   Ion,
 } from '@cesium/engine';
-import CesiumWaypointEntity from './CesiumWaypointEntity';
+import WaypointBillboardOverlay from './WaypointBillboardOverlay';
 import useCesiumInit from '../hooks/useCesiumInit';
+import FlatWaypointDisc from './FlatWaypointDisc';
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
@@ -57,7 +58,10 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSyst
         view={null}
       >
         {waypoints.map((wp, i) => (
-          <CesiumWaypointEntity key={i} wp={wp} unitSystem={unitSystem} index={i} />
+          <div key={i}>
+            <FlatWaypointDisc waypoints={waypoints} />
+            <WaypointBillboardOverlay waypoints={waypoints} />
+          </div>
         ))}
       </Viewer>
     </div>
