@@ -3,18 +3,29 @@
 import { useState } from 'react';
 import { Marker, Popup, useMapEvents, Polyline } from 'react-leaflet';
 import WaypointMarker from './WaypointMarker.jsx';
+import { getCesiumAltitude } from '../utils/getCesiumAltitude'; // adjust path as needed
 
 
 
-export default function WaypointManager({ waypoints, setWaypoints, unitSystem }) {
+export default function WaypointManager({ waypoints, setWaypoints, unitSystem, terrainProvider }) {
 
   useMapEvents({
-    click(e) {
+    click: async (e) => {
       const { lat, lng } = e.latlng;
-      setWaypoints((prev) => [...prev, { lat, lng }]);
+      let alt = 0;
+
+      if (terrainProvider) {
+        try {
+          alt = await getCesiumAltitude(terrainProvider, lat, lng);
+        } catch (err) {
+          console.warn("Failed to get terrain height, defaulting to 0", err);
+        }
+      }
+
+      setWaypoints((prev) => [...prev, { lat, lng, alt, groundAlt: alt }]);
     },
   });
-  console.log(waypoints);
+  console.log(waypoints); 
   return (
     <>
       {

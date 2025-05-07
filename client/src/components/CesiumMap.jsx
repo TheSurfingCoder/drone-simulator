@@ -39,7 +39,7 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSyst
     const lng = CesiumMath.toDegrees(result.longitude);
     const alt = result.height;
 
-    setWaypoints((prev) => [...prev, { lat, lng, alt }]);
+    setWaypoints((prev) => [...prev, { lat, lng, alt, groundAlt: alt }]);
   };
 
   if (!terrainProvider) return <div>Loading terrain...</div>;

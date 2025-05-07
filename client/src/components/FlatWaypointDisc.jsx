@@ -23,14 +23,14 @@ export default function FlatWaypointDisc({ waypoints }) {
     // Clean up existing discs on re-render
     const primitive = new Primitive({
       geometryInstances: waypoints.map((wp) => {
-        const position = Cartesian3.fromDegrees(wp.lng, wp.lat, wp.alt ?? 0);
+        const position = Cartesian3.fromDegrees(wp.lng, wp.lat, wp.groundAlt ?? 0);
 
         return new GeometryInstance({
           geometry: new EllipseGeometry({
             center: position,
             semiMajorAxis: 1.5, // 5m diameter
             semiMinorAxis: 1.5,
-            height: wp.alt ?? 0,
+            height: wp.groundAlt ?? 0
           }),
           attributes: {
             color: ColorGeometryInstanceAttribute.fromColor(Color.RED.withAlpha(0.95)),

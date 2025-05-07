@@ -127,7 +127,7 @@ export default function MissionPlannerWrapper() {
       </div>
 
       <div className="absolute top-[4.5rem] right-4 z-30 w-80">
-        <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} />
+        <WaypointList waypoints={waypoints} setWaypoints={setWaypoints} unitSystem={unitSystem} />
       </div>
 
       <div className="absolute top-[4.5rem] left-4 z-30 w-72">

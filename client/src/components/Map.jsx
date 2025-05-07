@@ -2,12 +2,20 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import WaypointManager from './WaypointManager';
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import droneIconSvg from '../assets/react.svg';
+import { Ion, createWorldTerrainAsync } from '@cesium/engine';
+import AltitudeSlider from './AltitudeSlider'; // adjust path if needed
+
+
+Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
+
+
 
 const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSystem, dronePosition }, ref) => {
   const mapInstance = useRef(null);
   const startPosition = [37.7749, -122.4194]; // SF
+  const [terrainProvider, setTerrainProvider] = useState(null);
 
   const droneIcon = new L.Icon({
     iconUrl: droneIconSvg,
@@ -21,7 +29,21 @@ const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitS
     }
   }));
 
-  console.log("🧭 Rendering MapComponent"); // ← Add this line
+  useEffect(() => {
+    const loadTerrain = async () => {
+      try {
+        const terrain = await createWorldTerrainAsync();
+        setTerrainProvider(terrain);
+      } catch (err) {
+        console.error("Failed to load Cesium terrain provider:", err);
+      }
+    };
+
+    loadTerrain();
+  }, []);
+
+  
+
 
   return (
     <div className="relative h-full w-full">
@@ -43,6 +65,7 @@ const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitS
           waypoints={waypoints}
           setWaypoints={setWaypoints}
           unitSystem={unitSystem}
+          terrainProvider={terrainProvider}
         />
         <Marker position={dronePosition} icon={droneIcon}>
           <Popup>Drone</Popup>
