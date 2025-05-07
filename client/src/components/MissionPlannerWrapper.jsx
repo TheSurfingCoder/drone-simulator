@@ -7,6 +7,7 @@ import LogPanel from './LogPanel';
 import WaypointList from './WaypointList';
 import MetricsPanel from './MetricsPanel';
 import CurrentLocationButton from './currentLocationButton';
+import { Cartesian3 } from '@cesium/engine';
 
 export default function MissionPlannerWrapper() {
   const [viewMode, setViewMode] = useState('2d');
@@ -19,36 +20,44 @@ export default function MissionPlannerWrapper() {
 
 
   const handleLocateMe = (lat, lng) => {
-    const map = mapRef.current;
+    console.log(`📍 Handling locate for ${viewMode.toUpperCase()}:`, lat, lng);
 
+    if (viewMode === '2d') {
+      const map = mapRef.current;
+      let retries = 0;
 
-    if (!map) {
-      console.warn("Map not ready yet.");
-      return;
+      const attemptToMove2D = () => {
+        const size = map?.getSize?.();
+        if (!size || size.x === 0 || size.y === 0) {
+          if (retries++ < 10) {
+            setTimeout(attemptToMove2D, 100);
+          } else {
+            console.warn("2D map never became ready.");
+          }
+          return;
+        }
+        map.setView([lat, lng], 15);
+        map.invalidateSize();
+      };
+
+      if (map) {
+        attemptToMove2D();
+      } else {
+        console.warn("2D map not ready yet.");
+      }
     }
 
-    let retries = 0;
-    const attemptToMove = () => {
-      const size = map.getSize?.();
-      if (!size || size.x === 0 || size.y === 0) {
-        if (retries++ < 10) {
-          setTimeout(attemptToMove, 100);
-        } else {
-          console.warn("Map never became ready.");
-        }
-        return;
+    if (viewMode === '3d') {
+      const viewer = viewerRef.current?.cesiumElement;
+      if (viewer) {
+        viewer.camera.flyTo({
+          destination: Cartesian3.fromDegrees(lng, lat, 1500),
+        });
+      } else {
+        console.warn("3D viewer not ready.");
       }
-
-      map.setView([lat, lng], 15);
-      map.invalidateSize();
-    };
-
-
-    attemptToMove(); // kick off the retry loop
+    }
   };
-
-
-  console.log("mapRef.current:", mapRef.current);
 
 
   const clearWaypoints = () => {

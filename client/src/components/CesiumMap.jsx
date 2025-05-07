@@ -1,69 +1,67 @@
 import { useRef, forwardRef, useImperativeHandle, useState, useEffect } from 'react';
-import { Viewer, Entity } from 'resium';
+import { Viewer } from 'resium';
 import {
-    Cartesian3,
-    Cartographic,
-    sampleTerrainMostDetailed,
-    Color,
-    Math as CesiumMath,
-    DistanceDisplayCondition,
-    CesiumTerrainProvider,
-    Ion
+  Cartesian3,
+  Cartographic,
+  sampleTerrainMostDetailed,
+  Math as CesiumMath,
+  Ion,
 } from '@cesium/engine';
-import UnitToggle from './UnitToggle';
 import CesiumWaypointEntity from './CesiumWaypointEntity';
 import useCesiumInit from '../hooks/useCesiumInit';
-import WaypointList from './WaypointList';
-
-
-
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
-export default function CesiumMap({ waypoints, setWaypoints, unitSystem, setUnitSystem }) {
-    const viewerRef = useRef();
-    const { viewer, terrainProvider } = useCesiumInit(viewerRef);
-    
+const CesiumMap = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSystem }, ref) => {
+  const viewerRef = useRef(null);
+  const { viewer, terrainProvider } = useCesiumInit(viewerRef);
 
-    // ✅ Handle clicks for waypoints
-    const handleClick = async (movement) => {
-        if (!viewer || !terrainProvider) return;
+  // 📡 Expose the underlying Cesium Viewer instance to the parent
+  useImperativeHandle(ref, () => ({
+    get cesiumElement() {
+      return viewerRef.current?.cesiumElement;
+    }
+  }));
 
-        const ray = viewer.scene.camera.getPickRay(movement.position);
-        const ellipsoidPosition = viewer.scene.globe.pick(ray, viewer.scene);
-        if (!ellipsoidPosition) return;
+  const handleClick = async (movement) => {
+    if (!viewer || !terrainProvider) return;
 
-        const cartographic = Cartographic.fromCartesian(ellipsoidPosition);
-        const updated = await sampleTerrainMostDetailed(terrainProvider, [cartographic]);
-        const result = updated[0];
+    const ray = viewer.scene.camera.getPickRay(movement.position);
+    const ellipsoidPosition = viewer.scene.globe.pick(ray, viewer.scene);
+    if (!ellipsoidPosition) return;
 
-        const lat = CesiumMath.toDegrees(result.latitude);
-        const lng = CesiumMath.toDegrees(result.longitude);
-        const alt = result.height;
+    const cartographic = Cartographic.fromCartesian(ellipsoidPosition);
+    const updated = await sampleTerrainMostDetailed(terrainProvider, [cartographic]);
+    const result = updated[0];
 
-        setWaypoints((prev) => [...prev, { lat, lng, alt }]);
-    };
+    const lat = CesiumMath.toDegrees(result.latitude);
+    const lng = CesiumMath.toDegrees(result.longitude);
+    const alt = result.height;
 
-    if (!terrainProvider) return <div>Loading terrain...</div>;
+    setWaypoints((prev) => [...prev, { lat, lng, alt }]);
+  };
 
-    return (
-        <div className="relative w-full h-full z-0">
-          <Viewer
-            full
-            ref={viewerRef}
-            terrainProvider={terrainProvider}
-            onClick={handleClick}
-           className="z-0"
-            sceneModePicker={false}
-            timeline={false}
-            animation={false}
-            view={null}
-          >
-            {waypoints.map((wp, i) => (
-              <CesiumWaypointEntity key={i} wp={wp} unitSystem={unitSystem} index={i} />
-            ))}
-          </Viewer>
-        </div>
-      );
-      
-}
+  if (!terrainProvider) return <div>Loading terrain...</div>;
+
+  return (
+    <div className="relative w-full h-full z-0">
+      <Viewer
+        full
+        ref={viewerRef}
+        terrainProvider={terrainProvider}
+        onClick={handleClick}
+        className="z-0"
+        sceneModePicker={false}
+        timeline={false}
+        animation={false}
+        view={null}
+      >
+        {waypoints.map((wp, i) => (
+          <CesiumWaypointEntity key={i} wp={wp} unitSystem={unitSystem} index={i} />
+        ))}
+      </Viewer>
+    </div>
+  );
+});
+
+export default CesiumMap;
