@@ -1,40 +1,38 @@
-//leaflet map and parent component for waypointmanager and dronecontroller
-
-//importing react leaflet compoentnts
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import droneIconSvg from '../assets/react.svg'
-import 'leaflet/dist/leaflet.css'; // Leaflet needs this for icons to display correctly
+import 'leaflet/dist/leaflet.css';
 import WaypointManager from './WaypointManager';
-import { useState } from 'react';
-import DroneController from './DroneController.jsx';
-import LogPanel from './LogPanel.jsx';
-import { GeoJSON } from 'react-leaflet';
-import MetricsPanel from './MetricsPanel.jsx';
-import UnitToggle from './UnitToggle.jsx';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import droneIconSvg from '../assets/react.svg';
 
-
-
-// Optional: custom drone icon (replace path if needed)
-
-
-
-export default function MapComponent({ waypoints, setWaypoints, unitSystem, setUnitSystem, dronePosition }) {
-  // home base
-  const startPosition = [37.7749, -122.4194]; // SF coordinates
+const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSystem, dronePosition }, ref) => {
+  const mapInstance = useRef(null);
+  const startPosition = [37.7749, -122.4194]; // SF
 
   const droneIcon = new L.Icon({
-    iconUrl: droneIconSvg, // or use default Leaflet icon
+    iconUrl: droneIconSvg,
     iconSize: [30, 30],
   });
 
+  // Expose a setView method to the parent via ref
+  useImperativeHandle(ref, () => ({
+    setView: (lat, lng, zoom = 15) => {
+      mapInstance.current?.setView([lat, lng], zoom);
+    }
+  }));
+
+  console.log("🧭 Rendering MapComponent"); // ← Add this line
 
   return (
     <div className="relative h-full w-full">
       <MapContainer
+        ref={ref}
         center={startPosition}
         zoom={13}
         scrollWheelZoom={true}
+        whenCreated={(map) => 
+          console.log("Leaflet map created:", map) // ✅ Add this
+          (mapInstance.current = map)} // bind map ref on creation
         className="fullscreen-map z-0"
       >
         <TileLayer
@@ -42,13 +40,16 @@ export default function MapComponent({ waypoints, setWaypoints, unitSystem, setU
           attribution='&copy; OpenStreetMap contributors'
         />
         <WaypointManager
-          waypoints={waypoints} setWaypoints={setWaypoints} unitSystem={unitSystem}
+          waypoints={waypoints}
+          setWaypoints={setWaypoints}
+          unitSystem={unitSystem}
         />
         <Marker position={dronePosition} icon={droneIcon}>
           <Popup>Drone</Popup>
         </Marker>
       </MapContainer>
-
     </div>
   );
-}
+});
+
+export default MapComponent;

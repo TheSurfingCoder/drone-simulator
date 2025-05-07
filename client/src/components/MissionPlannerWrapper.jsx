@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import MapComponent from './Map';
 import CesiumMap from './CesiumMap';
 import UnitToggle from './UnitToggle';
@@ -6,6 +6,7 @@ import DroneController from './DroneController';
 import LogPanel from './LogPanel';
 import WaypointList from './WaypointList';
 import MetricsPanel from './MetricsPanel';
+import CurrentLocationButton from './currentLocationButton';
 
 export default function MissionPlannerWrapper() {
   const [viewMode, setViewMode] = useState('2d');
@@ -13,6 +14,42 @@ export default function MissionPlannerWrapper() {
   const [unitSystem, setUnitSystem] = useState('metric');
   const [dronePosition, setDronePosition] = useState([37.7749, -122.4194]); // SF default
   const [logs, setLogs] = useState([]);
+  const mapRef = useRef(null);
+  const viewerRef = useRef(null);
+
+
+  const handleLocateMe = (lat, lng) => {
+    const map = mapRef.current;
+
+
+    if (!map) {
+      console.warn("Map not ready yet.");
+      return;
+    }
+
+    let retries = 0;
+    const attemptToMove = () => {
+      const size = map.getSize?.();
+      if (!size || size.x === 0 || size.y === 0) {
+        if (retries++ < 10) {
+          setTimeout(attemptToMove, 100);
+        } else {
+          console.warn("Map never became ready.");
+        }
+        return;
+      }
+
+      map.setView([lat, lng], 15);
+      map.invalidateSize();
+    };
+
+
+    attemptToMove(); // kick off the retry loop
+  };
+
+
+  console.log("mapRef.current:", mapRef.current);
+
 
   const clearWaypoints = () => {
     setWaypoints([]);
@@ -22,6 +59,9 @@ export default function MissionPlannerWrapper() {
     setLogs([]);
   };
 
+
+
+
   return (
     <div className="h-screen w-screen relative">
       {/* 🧭 Top Bar */}
@@ -29,14 +69,15 @@ export default function MissionPlannerWrapper() {
         <div className="flex items-center gap-3">
           <UnitToggle unitSystem={unitSystem} onChange={setUnitSystem} />
           <DroneController
-          className="bg-green-600 text-white px-3 py-1 rounded"
-          waypoints={waypoints}
-          setDronePosition={setDronePosition}
-          dronePosition={dronePosition}
-          logs={logs}
-          setLogs={setLogs}
-          handleClearWaypoints={clearWaypoints}
-        />
+            className="bg-green-600 text-white px-3 py-1 rounded"
+            waypoints={waypoints}
+            setDronePosition={setDronePosition}
+            dronePosition={dronePosition}
+            logs={logs}
+            setLogs={setLogs}
+            handleClearWaypoints={clearWaypoints}
+          />
+          <CurrentLocationButton onLocate={handleLocateMe} />
         </div>
         <div>
           <button
@@ -57,6 +98,7 @@ export default function MissionPlannerWrapper() {
             unitSystem={unitSystem}
             setUnitSystem={setUnitSystem}
             dronePosition={dronePosition}
+            ref={mapRef}
           />
         ) : (
           <CesiumMap
@@ -64,6 +106,7 @@ export default function MissionPlannerWrapper() {
             setWaypoints={setWaypoints}
             unitSystem={unitSystem}
             setUnitSystem={setUnitSystem}
+            ref={viewerRef}
           />
         )}
       </div>
