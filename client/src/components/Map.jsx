@@ -22,12 +22,7 @@ const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitS
     iconSize: [30, 30],
   });
 
-  // Expose a setView method to the parent via ref
-  useImperativeHandle(ref, () => ({
-    setView: (lat, lng, zoom = 15) => {
-      mapInstance.current?.setView([lat, lng], zoom);
-    }
-  }));
+ 
 
   useEffect(() => {
     const loadTerrain = async () => {

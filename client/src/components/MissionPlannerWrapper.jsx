@@ -21,30 +21,15 @@ export default function MissionPlannerWrapper() {
 
   const handleLocateMe = (lat, lng) => {
     console.log(`📍 Handling locate for ${viewMode.toUpperCase()}:`, lat, lng);
-
+    console.log(mapRef.current)
     if (viewMode === '2d') {
       const map = mapRef.current;
-      let retries = 0;
-
-      const attemptToMove2D = () => {
-        const size = map?.getSize?.();
-        if (!size || size.x === 0 || size.y === 0) {
-          if (retries++ < 10) {
-            setTimeout(attemptToMove2D, 100);
-          } else {
-            console.warn("2D map never became ready.");
-          }
-          return;
-        }
         map.setView([lat, lng], 15);
-        map.invalidateSize();
-      };
+        map.invalidateSize()
+       
+      
 
-      if (map) {
-        attemptToMove2D();
-      } else {
-        console.warn("2D map not ready yet.");
-      }
+     
     }
 
     if (viewMode === '3d') {
