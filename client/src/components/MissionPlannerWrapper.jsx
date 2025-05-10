@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import MapComponent from './Map';
 import CesiumMap from './CesiumMap';
 import UnitToggle from './UnitToggle';
@@ -18,6 +18,11 @@ export default function MissionPlannerWrapper() {
   const mapRef = useRef(null);
   const viewerRef = useRef(null);
 
+
+
+  useEffect(()=>{
+    console.log("Line 24 missionPlannerWrapper. MIssion planner wrapper has rendered to the DOM")
+  })
 
   const handleLocateMe = (lat, lng) => {
     console.log(`📍 Handling locate for ${viewMode.toUpperCase()}:`, lat, lng);

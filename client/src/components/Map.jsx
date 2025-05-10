@@ -20,7 +20,9 @@ const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, dronePos
     iconSize: [30, 30],
   });
 
- 
+useEffect(()=>{
+  console.log("line 24 from map.jsx. Map.jsx has rendered")
+})
 
   useEffect(() => {
     const loadTerrain = async () => {

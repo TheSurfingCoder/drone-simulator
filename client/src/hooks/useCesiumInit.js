@@ -12,8 +12,9 @@ export default function useCesiumInit(viewerRef) {
       try {
         const terrain = await CesiumTerrainProvider.fromIonAssetId(1);
         await terrain.readyPromise;
-        console.log("✅ Terrain loaded");
+        console.log("✅ Terrain loaded", terrainProvider);
         setTerrainProvider(terrain);
+        console.log(terrainProvider)
       } catch (err) {
         console.error("❌ Terrain failed:", err);
       }
