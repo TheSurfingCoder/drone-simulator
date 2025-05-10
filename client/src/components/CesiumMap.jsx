@@ -145,13 +145,6 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
         timeline={false}
         animation={false}
         view={null}
-        contextOptions={{
-          webgl: {
-            failIfMajorPerformanceCaveat: false,
-            powerPreference: "high-performance",
-          },
-          requestWebgl2: true, // <-- This is the key line!
-        }}
       >
         {waypoints.map((wp, i) => (
           <div key={i}>
