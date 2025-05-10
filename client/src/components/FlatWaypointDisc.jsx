@@ -1,3 +1,5 @@
+
+/*
 import { useEffect } from 'react';
 import {
   EllipseGeometry,
@@ -54,3 +56,4 @@ export default function FlatWaypointDisc({ waypoints }) {
 
   return null;
 }
+*/

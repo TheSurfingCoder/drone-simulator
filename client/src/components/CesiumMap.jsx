@@ -9,7 +9,6 @@ import {
 } from '@cesium/engine';
 import WaypointBillboardOverlay from './WaypointBillboardOverlay';
 import useCesiumInit from '../hooks/useCesiumInit';
-import FlatWaypointDisc from './FlatWaypointDisc';
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
@@ -71,7 +70,6 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
       >
         {waypoints.map((wp, i) => (
           <div key={i}>
-            <FlatWaypointDisc waypoints={waypoints} />
             <WaypointBillboardOverlay waypoints={waypoints} />
           </div>
         ))}
