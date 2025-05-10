@@ -2,18 +2,16 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import WaypointManager from './WaypointManager';
-import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import droneIconSvg from '../assets/react.svg';
 import { Ion, createWorldTerrainAsync } from '@cesium/engine';
-import AltitudeSlider from './AltitudeSlider'; // adjust path if needed
 
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
 
 
-const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSystem, dronePosition }, ref) => {
-  const mapInstance = useRef(null);
+const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, dronePosition }, ref) => {
   const startPosition = [37.7749, -122.4194]; // SF
   const [terrainProvider, setTerrainProvider] = useState(null);
 
@@ -49,7 +47,7 @@ const MapComponent = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitS
         scrollWheelZoom={true}
         whenCreated={(map) => 
           console.log("Leaflet map created:", map) // ✅ Add this
-          (mapInstance.current = map)} // bind map ref on creation
+          } // bind map ref on creation
         className="fullscreen-map z-0"
       >
         <TileLayer

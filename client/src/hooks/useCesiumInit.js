@@ -21,6 +21,8 @@ export default function useCesiumInit(viewerRef) {
     loadTerrain();
   }, []);
 
+
+
   useEffect(() => {
     const tryAttachViewer = () => {
       if (!viewer && viewerRef.current?.cesiumElement) {
@@ -31,7 +33,7 @@ export default function useCesiumInit(viewerRef) {
 
     const interval = setInterval(tryAttachViewer, 200);
     return () => clearInterval(interval);
-  }, [viewer]);
+  }, [viewerRef, viewer]);
 
   useEffect(() => {
     if (!viewer || !terrainProvider) return;

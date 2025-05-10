@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useImperativeHandle, useState, useEffect } from 'react';
+import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { Viewer } from 'resium';
 import {
   Cartesian3,
@@ -13,9 +13,21 @@ import FlatWaypointDisc from './FlatWaypointDisc';
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
-const CesiumMap = forwardRef(({ waypoints, setWaypoints, unitSystem, setUnitSystem }, ref) => {
+const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
   const viewerRef = useRef(null);
+  console.log("initial viewRef.current: ", viewerRef.current)
   const { viewer, terrainProvider } = useCesiumInit(viewerRef);
+
+
+  useEffect(() => {
+    const interval = setInterval(()=> {
+      console.log("viewRef.current in cesiumMap", viewerRef.current);
+      if(viewerRef.current?.cesiumElement){
+        console.log("✅  Cesium viewer is available on CesiumMap", viewerRef.current.cesiumElement)
+        clearInterval(interval)
+      }
+    }, 200)
+  }, [])
 
   // 📡 Expose the underlying Cesium Viewer instance to the parent
   useImperativeHandle(ref, () => ({

@@ -1,7 +1,5 @@
 //click handling + waypoint storage + polyline
-
-import { useState } from 'react';
-import { Marker, Popup, useMapEvents, Polyline } from 'react-leaflet';
+import { useMapEvents, Polyline } from 'react-leaflet';
 import WaypointMarker from './WaypointMarker.jsx';
 import { getCesiumAltitude } from '../utils/getCesiumAltitude'; // adjust path as needed
 

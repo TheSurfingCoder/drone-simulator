@@ -2,7 +2,7 @@
 //drone component is receiving props from map
 import { moveToward } from "../utils/droneMovement";
 
-export default function DroneController({ waypoints, setDronePosition, dronePosition, logs, setLogs, handleClearWaypoints }) {
+export default function DroneController({ waypoints, setDronePosition, logs, setLogs, handleClearWaypoints }) {
 
     function handleStartMission() {
         console.log("Starting mission...");
