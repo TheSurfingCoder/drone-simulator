@@ -45,6 +45,8 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
       if(viewerRef.current?.cesiumElement){
         console.log("✅  Cesium viewer is available on CesiumMap", viewerRef.current.cesiumElement)
         clearInterval(interval)
+      } else{
+        clearInterval(interval);
       }
     }, 200)
   }, [])
