@@ -6,7 +6,7 @@ import DroneController from './DroneController';
 import LogPanel from './LogPanel';
 import WaypointList from './WaypointList';
 import MetricsPanel from './MetricsPanel';
-import CurrentLocationButton from './currentLocationButton';
+import CurrentLocationButton from './CurrentLocationButton';
 import { Cartesian3 } from '@cesium/engine';
 
 export default function MissionPlannerWrapper() {
