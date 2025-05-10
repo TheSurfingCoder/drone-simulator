@@ -13,6 +13,26 @@ import FlatWaypointDisc from './FlatWaypointDisc';
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
+
+function supportsVertexTextureFetch(){
+  try{
+    const canvas = document.createElement('canvas');
+    const gl = 
+      canvas.getContext('webGL') || canvas.getContext('experimental-webGL');
+
+      if(!gl) return false
+
+      const maxVertexTextureImageUnits = gl.getParameter(
+        gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS
+      );
+
+      return maxVertexTextureImageUnits > 0
+  } catch(e){
+    return false;
+  }
+}
+
+
 const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
   const viewerRef = useRef(null);
   console.log("initial viewRef.current: ", viewerRef.current)
@@ -28,6 +48,15 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
       }
     }, 200)
   }, [])
+
+  useEffect(()=>{
+    if(!supportsVertexTextureFetch()){
+      console.warn("🚫 Vertex texture fetch not supported.");
+      alert("3D rendering may not work correctly on this device")
+    }
+  }, [])
+
+
 
   // 📡 Expose the underlying Cesium Viewer instance to the parent
   useImperativeHandle(ref, () => ({
@@ -53,6 +82,8 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
 
     setWaypoints((prev) => [...prev, { lat, lng, alt, groundAlt: alt }]);
   };
+
+
 
   if (!terrainProvider) return <div>Loading terrain...</div>;
 
