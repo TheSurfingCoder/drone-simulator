@@ -85,8 +85,12 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
 
 
 
-  if (!terrainProvider) return <div>Loading terrain...</div>;
 
+  if (!terrainProvider){
+    console.log("Terrain is not available. Check useCesiumInit() I'm printing from Cesiummap.jsx")
+    return <div>Loading terrain...</div>;
+  } 
+ 
   return (
     <div className="relative w-full h-full z-0">
       <Viewer
