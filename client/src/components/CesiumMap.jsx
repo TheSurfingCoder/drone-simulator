@@ -46,7 +46,7 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
         console.log("✅  Cesium viewer is available on CesiumMap", viewerRef.current.cesiumElement)
         clearInterval(interval)
       } else {
-        console.log("map never got rendered. line 49 in cesiumMap.jsx")
+        console.log("map never got rendered. line 49 in cesiumMap.jsx.")
       }
       
     }, 200)
