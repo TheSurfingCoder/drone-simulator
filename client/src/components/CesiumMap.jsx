@@ -1,11 +1,12 @@
 import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
-import { Viewer } from 'resium';
+import { Viewer, Cesium3DTileset } from 'resium';
 import {
   Cartesian3,
   Cartographic,
   sampleTerrainMostDetailed,
   Math as CesiumMath,
   Ion,
+  IonResource
 } from '@cesium/engine';
 import WaypointBillboardOverlay from './WaypointBillboardOverlay';
 import useCesiumInit from '../hooks/useCesiumInit';
@@ -16,6 +17,7 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
   const viewerRef = useRef(null);
   console.log("initial viewRef.current: ", viewerRef.current)
   const { viewer, terrainProvider } = useCesiumInit(viewerRef);
+  
 
 
   useEffect(() => {
@@ -68,6 +70,7 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
         animation={false}
         view={null}
       >
+         <Cesium3DTileset url={IonResource.fromAssetId(96188)} />
         {waypoints.map((wp, i) => (
           <div key={i}>
             <WaypointBillboardOverlay waypoints={waypoints} />
@@ -79,3 +82,4 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
 });
 
 export default CesiumMap;
+
