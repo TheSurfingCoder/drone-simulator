@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
+import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from 'react';
 import { Viewer, Cesium3DTileset } from 'resium';
 import {
   Cartesian3,
@@ -10,20 +10,22 @@ import {
 } from '@cesium/engine';
 import WaypointBillboardOverlay from './WaypointBillboardOverlay';
 import useCesiumInit from '../hooks/useCesiumInit';
+import Layers from './Layers';
 
 Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_TOKEN;
 
-const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
+const CesiumMap = forwardRef(({ waypoints, setWaypoints }, ref) => {
   const viewerRef = useRef(null);
   console.log("initial viewRef.current: ", viewerRef.current)
   const { viewer, terrainProvider } = useCesiumInit(viewerRef);
-  
+  const [showOSM, setShowOSM] = useState(true);
+  const [showGoogle, setShowGoogle] = useState(true);
 
 
   useEffect(() => {
-    const interval = setInterval(()=> {
+    const interval = setInterval(() => {
       console.log("viewRef.current in cesiumMap", viewerRef.current);
-      if(viewerRef.current?.cesiumElement){
+      if (viewerRef.current?.cesiumElement) {
         console.log("✅  Cesium viewer is available on CesiumMap", viewerRef.current.cesiumElement)
         clearInterval(interval)
       }
@@ -36,6 +38,11 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
       return viewerRef.current?.cesiumElement;
     }
   }));
+
+  const handleToggle = (layer) => {
+    if (layer === 'osm') setShowOSM((prev) => !prev)
+    if (layer === 'google') setShowGoogle((prev) => !prev)
+  }
 
   const handleClick = async (movement) => {
     if (!viewer || !terrainProvider) return;
@@ -59,6 +66,11 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
 
   return (
     <div className="relative w-full h-full z-0">
+      <Layers
+        showOSM={showOSM}
+        showGoogle={showGoogle}
+        onToggle={handleToggle}
+      />
       <Viewer
         full
         ref={viewerRef}
@@ -69,8 +81,12 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints}, ref) => {
         timeline={false}
         animation={false}
         view={null}
-      >
-         <Cesium3DTileset url={IonResource.fromAssetId(96188)} />
+      >{showOSM && (
+        <Cesium3DTileset url={IonResource.fromAssetId(96188)} />
+      )}
+        {showGoogle && (<Cesium3DTileset
+          url={IonResource.fromAssetId(2275207)} // <- 2275205 is the asset ID for Google's photorealistic tiles
+        />)}
         {waypoints.map((wp, i) => (
           <div key={i}>
             <WaypointBillboardOverlay waypoints={waypoints} />
