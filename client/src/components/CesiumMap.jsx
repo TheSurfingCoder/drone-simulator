@@ -82,10 +82,16 @@ const CesiumMap = forwardRef(({ waypoints, setWaypoints }, ref) => {
         animation={false}
         view={null}
       >{showOSM && (
-        <Cesium3DTileset url={IonResource.fromAssetId(96188)} />
+        <Cesium3DTileset url={IonResource.fromAssetId(96188)} 
+        onError={e => { console.error("OSM Tileset error", e); }}
+        onReady={e => {console.log("Tileset loaded!", e)}}
+        />
+
       )}
         {showGoogle && (<Cesium3DTileset
-          url={IonResource.fromAssetId(2275207)} // <- 2275205 is the asset ID for Google's photorealistic tiles
+          url={IonResource.fromAssetId(2275207)} 
+          onError={e => { console.error("OSM Tileset error", e); }}
+          onReady={e => {console.log("Tileset loaded!", e)}}
         />)}
         {waypoints.map((wp, i) => (
           <div key={i}>
